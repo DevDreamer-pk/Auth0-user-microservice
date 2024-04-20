@@ -1,0 +1,26 @@
+{
+  "name": "auth0-user-microservice",
+  "version": "1.0.0",
+  "description": "auth0 implimentation",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "paramjeet",
+  "type": "module",
+  "license": "ISC",
+  "dependencies": {
+    "auth0": "^4.3.1",
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jwt-decode": "^4.0.0",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
