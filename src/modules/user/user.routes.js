@@ -1,5 +1,4 @@
 import express from "express";
-
 import userController from "./user.controller.js"
 const userRouter = express.Router();
 
@@ -7,6 +6,8 @@ userRouter.post("/signup", new userController().signUp)
 userRouter.post("/login", new userController().login)
 userRouter.post("/change-password", new userController().changePassword)
 userRouter.post("/forgot-password", new userController().forgotPassword)
+userRouter.post("/request-google-auth", new userController().requestGoogleAuth)
+userRouter.get("/google-login", new userController().googleLogin)
 
 
 // Application type must be Regular web application, Applications --> settings  --> Application type

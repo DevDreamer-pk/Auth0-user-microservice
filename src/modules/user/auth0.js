@@ -1,5 +1,6 @@
 import HttpService from "../../service/httpService.js";
 import { jwtDecode } from "jwt-decode";
+import { OAuth2Client } from "google-auth-library";
 import CryptoJS from "crypto-js";
 // const CryptoJS = require('crypto-js');
 export default class Auth {
@@ -81,7 +82,8 @@ export default class Auth {
     } catch (error) {
       console.log(error);
       throw {
-        message: error.message,
+        message: error.response.data.message,
+        statusCode: error.response.data.statusCode,
       };
     }
   };
@@ -292,6 +294,83 @@ export default class Auth {
         status: error.response.status,
       };
     }
+  };
+
+  getUserData = async (access_token) => {
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
+    );
+
+    //console.log('response',response);
+    const data = await response.json();
+    console.log("data", data);
+  };
+
+  requestGoogleAuth = async (res) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Referrer-Policy", "no-referrer-when-downgrade");
+    const redirectURL = "http://localhost:4000/api/user/google-login";
+
+    const oAuth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      redirectURL
+    );
+
+    // Generate the url that will be used for the consent dialog.
+    const authorizeUrl = oAuth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: "https://www.googleapis.com/auth/userinfo.profile  openid https://www.googleapis.com/auth/userinfo.email",
+      prompt: "consent",
+    });
+
+    //   res.json({url:authorizeUrl})
+    return authorizeUrl;
+  };
+
+  getUserData = async (access_token) => {
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  googleLogin = async (req, res) => {
+    const code = req.query.code;
+
+    console.log(code);
+    try {
+      const redirectURL = "http://localhost:4000/api/user/google-login";
+      const oAuth2Client = new OAuth2Client(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        redirectURL
+      );
+      const r = await new Promise((resolve, reject) => {
+        oAuth2Client.getToken(code, (err, tokens) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(tokens);
+          }
+        });
+      });
+      // const r =  await oAuth2Client.getToken(code);
+      // Make sure to set the credentials on the OAuth2 client.
+      await oAuth2Client.setCredentials(r.access_token);
+      // const user = oAuth2Client.credentials;
+      // console.log('credentials',user);
+      const userData = await this.getUserData(oAuth2Client.credentials);
+      console.log("userData", userData);
+    //   return userData;
+    } catch (err) {
+      console.log("Error logging in with OAuth2 user", err);
+      throw err;
+    }
+
+    res.redirect(303, 'http://localhost:3000/');
   };
 
   // Assignment API

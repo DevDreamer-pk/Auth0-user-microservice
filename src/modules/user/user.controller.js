@@ -71,6 +71,34 @@ export default class UserController {
       res.status(500).send(error);
     }
   }
+  async requestGoogleAuth(req, res) {
+    try {
+      const url = await new userManager().requestGoogleAuth(res);
+      if (url == false) {
+        res.status(500).send(url);
+      } else {
+        res.status(201).json(url);
+        // res.status(201).send(url);
+      }
+    } catch (error) {
+      console.log("Controller Error", error);
+      res.status(500).send(error);
+    }
+  }
+
+  async googleLogin(req, res) {
+    try {
+      const result = await new userManager().googleLogin(req, res);
+      // if (result == false) {
+      //   res.status(500).send(result);
+      // } else {
+      //   res.status(201).send(result);
+      // }
+    } catch (error) {
+      console.log("Controller Error", error);
+      res.status(500).send(error);
+    }
+  }
 
   async passwordlessLogin(req, res) {
     try {

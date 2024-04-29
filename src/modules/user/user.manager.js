@@ -39,7 +39,7 @@ export default class UserManager {
       return { success: true, Data: result };
     } catch (error) {
       console.log("Manager Error", error);
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -106,6 +106,41 @@ export default class UserManager {
         Data: updatedPass,
       };
       return result;
+    } catch (error) {
+      console.log("Manager Error", error);
+      throw error;
+    }
+  }
+
+  async requestGoogleAuth(res) {
+    try {
+      const url = await new UserAuth().requestGoogleAuth(res);
+      if (!url) {
+        return { success: false, message: "error in google login" };
+      }
+      const result = {
+        success: true,
+        url: url,
+      };
+      return result;
+    } catch (error) {
+      console.log("Manager Error", error);
+      throw error;
+    }
+  }
+
+  async googleLogin(req, res) {
+    try {
+    //   const { accessToken } = userData;
+      const userData = await new UserAuth().googleLogin(req, res);
+    //   if (!userData) {
+    //     return { success: false, message: "User Not Found" };
+    //   }
+    //   const result = {
+    //     success: true,
+    //     Data: userData,
+    //   };
+    //   return result;
     } catch (error) {
       console.log("Manager Error", error);
       throw error;
